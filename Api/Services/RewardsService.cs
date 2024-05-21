@@ -51,7 +51,6 @@ public class RewardsService : IRewardsService
                 }
             }
         }
-
     }
 
     public bool IsWithinAttractionProximity(Attraction attraction, Locations location)
