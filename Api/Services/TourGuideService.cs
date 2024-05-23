@@ -92,16 +92,15 @@ public class TourGuideService : ITourGuideService
 
     public List<Attraction> GetNearByAttractions(VisitedLocation visitedLocation)
     {
-        List<Attraction> nearbyAttractions = new ();
-        foreach (var attraction in _gpsUtil.GetAttractions())
+        List<Attraction> attractions = _gpsUtil.GetAttractions();   
+        List<AttractionDistance> attractionsDistance = new();
+        for (int i = 0; i < attractions.Count; i++)
         {
-            if (_rewardsService.IsWithinAttractionProximity(attraction, visitedLocation.Location))
-            {
-                nearbyAttractions.Add(attraction);
-            }
+            attractionsDistance.Add(new AttractionDistance(
+                attractions[i],
+                _rewardsService.GetDistance(attractions[i], visitedLocation.Location)));
         }
-
-        return nearbyAttractions;
+        return attractionsDistance.OrderBy(a => a.Distance).Select(ad => ad.Attraction).Take(5).ToList();
     }
 
     private void AddShutDownHook()
@@ -152,5 +151,18 @@ public class TourGuideService : ITourGuideService
     private DateTime GetRandomTime()
     {
         return DateTime.UtcNow.AddDays(-new Random().Next(30));
+    }
+}
+
+// Cette classe permet de stocker une attraction et sa distance
+internal class AttractionDistance
+{
+    public Attraction Attraction { get; set; }
+    public double Distance { get; set; }
+
+    public AttractionDistance(Attraction attraction, double distance)
+    {
+        Attraction = attraction;
+        Distance = distance;
     }
 }
