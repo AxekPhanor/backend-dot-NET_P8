@@ -11,10 +11,12 @@ namespace TourGuide.Controllers;
 public class TourGuideController : ControllerBase
 {
     private readonly ITourGuideService _tourGuideService;
+    private readonly IRewardsService _rewardsService;
 
-    public TourGuideController(ITourGuideService tourGuideService)
+    public TourGuideController(ITourGuideService tourGuideService, IRewardsService rewardsService)
     {
         _tourGuideService = tourGuideService;
+        _rewardsService = rewardsService;
     }
 
     [HttpGet("getLocation")]
@@ -24,21 +26,23 @@ public class TourGuideController : ControllerBase
         return Ok(location);
     }
 
-    // TODO: Change this method to no longer return a List of Attractions.
-    // Instead: Get the closest five tourist attractions to the user - no matter how far away they are.
-    // Return a new JSON object that contains:
-    // Name of Tourist attraction, 
-    // Tourist attractions lat/long, 
-    // The user's location lat/long, 
-    // The distance in miles between the user's location and each of the attractions.
-    // The reward points for visiting each Attraction.
-    //    Note: Attraction reward points can be gathered from RewardsCentral
     [HttpGet("getNearbyAttractions")]
     public ActionResult<List<Attraction>> GetNearbyAttractions([FromQuery] string userName)
     {
+        List<object> list = new List<object>();
         var visitedLocation = _tourGuideService.GetUserLocation(GetUser(userName));
         var attractions = _tourGuideService.GetNearByAttractions(visitedLocation);
-        return Ok(attractions);
+        foreach(var attraction in attractions)
+        {
+            list.Add(new { 
+                AttractionName = attraction.AttractionName,
+                Latitude = attraction.Latitude,
+                Longitude = attraction.Longitude,
+                Distance = _rewardsService.GetDistance(attraction, visitedLocation.Location),
+                Reward = _rewardsService.GetRewardPoints(attraction, GetUser(userName))
+            });
+        }
+        return Ok(list);
     }
 
     [HttpGet("getRewards")]
@@ -53,6 +57,13 @@ public class TourGuideController : ControllerBase
     {
         var deals = _tourGuideService.GetTripDeals(GetUser(userName));
         return Ok(deals);
+    }
+
+    [HttpGet("getAllUsers")]
+    public ActionResult<List<User>> GetAllUsers()
+    {
+        var users = _tourGuideService.GetAllUsers();
+        return Ok(users);
     }
 
     private User GetUser(string userName)
