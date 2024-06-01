@@ -35,15 +35,17 @@ public class GpsUtil
         }
     }
 
-    public List<Attraction> GetAttractions()
+    public async Task<List<Attraction>> GetAttractions()
     {
-        rateLimiter.Wait();
+        await rateLimiter.WaitAsync();
 
         try
         {
-            SleepLighter();
+            var attractions = await Task.Run(() =>
+            {
+                SleepLighter();
 
-            List<Attraction> attractions = new()
+                List<Attraction> attractions = new()
         {
             new Attraction("Disneyland", "Anaheim", "CA", 33.817595, -117.922008),
             new Attraction("Jackson Hole", "Jackson Hole", "WY", 43.582767, -110.821999),
@@ -73,6 +75,8 @@ public class GpsUtil
             new Attraction("Cinderella Castle", "Orlando", "FL", 28.419411, -81.5812)
         };
 
+                return attractions;
+            });
             return attractions;
         }
         finally

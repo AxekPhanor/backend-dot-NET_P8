@@ -1,4 +1,6 @@
 ﻿using GpsUtil.Location;
+using System.Data;
+using System.Runtime.InteropServices;
 using TourGuide.LibrairiesWrappers.Interfaces;
 using TourGuide.Services.Interfaces;
 using TourGuide.Users;
@@ -18,7 +20,7 @@ public class RewardsService : IRewardsService
     public RewardsService(IGpsUtil gpsUtil, IRewardCentral rewardCentral)
     {
         _gpsUtil = gpsUtil;
-        _rewardsCentral =rewardCentral;
+        _rewardsCentral = rewardCentral;
         _proximityBuffer = _defaultProximityBuffer;
     }
 
@@ -32,23 +34,59 @@ public class RewardsService : IRewardsService
         _proximityBuffer = _defaultProximityBuffer;
     }
 
-    public void CalculateRewards(User user)
+    public async Task CalculateRewards(User user)
     {
-        count++;
         List<VisitedLocation> userLocations = user.VisitedLocations;
-        List<Attraction> attractions = _gpsUtil.GetAttractions();
+        var attractions = await _gpsUtil.GetAttractions();
+        var nbUserLocations = userLocations.Count;
+        var nbAttractions = attractions.Count;
+        bool flag = true;
 
-        for (int i = 0; i < userLocations.Count; i++)
+        for (int i = 0; i < nbUserLocations; i++)
         {
-            for (int j = 0; j < attractions.Count; j++)
+            for (int j = 0; j < nbAttractions; j++)
             {
-                if (!user.UserRewards.Any(r => r.Attraction.AttractionName == attractions[j].AttractionName))
+                for (int k = 0; k < user.UserRewards.Count; k++)
+                {
+                    if (user.UserRewards[k].Attraction.AttractionName == attractions[j].AttractionName)
+                    {
+                        attractions.Remove(attractions[j]);
+                        nbAttractions--;
+                        flag = false; break;
+                    }
+                }
+                if (flag)
                 {
                     if (NearAttraction(userLocations[i], attractions[j]))
                     {
                         user.AddUserReward(new UserReward(userLocations[i], attractions[j], GetRewardPoints(attractions[j], user)));
                     }
                 }
+                flag = true;
+            }
+        }
+    }
+
+    public async Task CalculateRewardsImprove(User user)
+    {
+        List<VisitedLocation> userLocations = user.VisitedLocations;
+        var attractions = await _gpsUtil.GetAttractions();
+        var userRewardedAttractions = new HashSet<string>(user.UserRewards.Select(r => r.Attraction.AttractionName));
+        var nbUserLocations = userLocations.Count;
+        var nbAttractions = attractions.Count;
+        var tempReward = new List<UserReward>();
+        var attractionNearLocation = new Dictionary<VisitedLocation, List<Attraction>>();
+
+        for (int i = 0; i < userLocations.Count; i++)
+        {
+            var location = userLocations[i];
+            attractionNearLocation[userLocations[i]] = attractions.Where(attraction => NearAttraction(location, attraction)).ToList();
+        }
+        for (int i = 0; i < userLocations.Count; i++)
+        {
+            for (int j = 0; j < attractionNearLocation[userLocations[i]].Count; j++)
+            {
+                user.AddUserReward(new UserReward(userLocations[i], attractionNearLocation[userLocations[i]][j], GetRewardPoints(attractions[j], user)));
             }
         }
     }
