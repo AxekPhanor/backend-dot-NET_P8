@@ -84,7 +84,7 @@ public class TourGuideService : ITourGuideService
 
     public async Task<VisitedLocation> TrackUserLocation(User user)
     {
-        VisitedLocation visitedLocation = _gpsUtil.GetUserLocation(user.UserId);
+        VisitedLocation visitedLocation = await _gpsUtil.GetUserLocation(user.UserId);
         user.AddToVisitedLocations(visitedLocation);
         await _rewardsService.CalculateRewards(user);
         return visitedLocation;

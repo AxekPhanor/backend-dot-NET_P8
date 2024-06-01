@@ -44,21 +44,22 @@ namespace TourGuideTest
             _output = output;
         }
 
-        [Fact(Skip = ("Delete Skip when you want to pass the test"))]
-        public void HighVolumeTrackLocation()
+        [Fact()]
+        public async Task HighVolumeTrackLocation()
         {
             //On peut ici augmenter le nombre d'utilisateurs pour tester les performances
-            _fixture.Initialize(1000);
+            _fixture.Initialize(100000);
 
             List<User> allUsers = _fixture.TourGuideService.GetAllUsers();
 
             Stopwatch stopWatch = new Stopwatch();
             stopWatch.Start();
-
+            var tasks = new List<Task>();
             foreach (var user in allUsers)
             {
-                _fixture.TourGuideService.TrackUserLocation(user);
+                tasks.Add(_fixture.TourGuideService.TrackUserLocation(user));
             }
+            await Task.WhenAll(tasks);
             stopWatch.Stop();
             _fixture.TourGuideService.Tracker.StopTracking();
 

@@ -12,22 +12,24 @@ public class GpsUtil
 {
     private static readonly SemaphoreSlim rateLimiter = new(1000, 1000);
 
-    public VisitedLocation GetUserLocation(Guid userId)
+    public async Task<VisitedLocation> GetUserLocation(Guid userId)
     {
         rateLimiter.Wait();
         try
         {
-            Sleep();
+            return await Task.Run(() => {
+                Sleep();
 
-            double longitude = ThreadLocalRandom.NextDouble(-180.0, 180.0);
-            longitude = Math.Round(longitude, 6);
+                double longitude = ThreadLocalRandom.NextDouble(-180.0, 180.0);
+                longitude = Math.Round(longitude, 6);
 
-            double latitude = ThreadLocalRandom.NextDouble(-90, 90);
-            latitude = Math.Round(latitude, 6);
+                double latitude = ThreadLocalRandom.NextDouble(-90, 90);
+                latitude = Math.Round(latitude, 6);
 
-            VisitedLocation visitedLocation = new(userId, new Locations(latitude, longitude), DateTime.UtcNow);
+                VisitedLocation visitedLocation = new(userId, new Locations(latitude, longitude), DateTime.UtcNow);
 
-            return visitedLocation;
+                return visitedLocation;
+            });
         }
         finally
         {
