@@ -39,11 +39,10 @@ public class GpsUtil
 
     public async Task<List<Attraction>> GetAttractions()
     {
-        await rateLimiter.WaitAsync();
-
+        rateLimiter.Wait();
         try
         {
-            var attractions = await Task.Run(() =>
+            return await Task.Run(() =>
             {
                 SleepLighter();
 
@@ -76,10 +75,8 @@ public class GpsUtil
             new Attraction("Bronx Zoo", "Bronx", "NY", 40.852905, -73.872971),
             new Attraction("Cinderella Castle", "Orlando", "FL", 28.419411, -81.5812)
         };
-
                 return attractions;
             });
-            return attractions;
         }
         finally
         {
