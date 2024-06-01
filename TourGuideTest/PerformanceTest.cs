@@ -80,9 +80,9 @@ namespace TourGuideTest
             List<User> allUsers = _fixture.TourGuideService.GetAllUsers();
             allUsers.ForEach(u => u.AddToVisitedLocations(new VisitedLocation(u.UserId, attractions[0], DateTime.Now)));
             var tasks = new List<Task>();
-            for(int i = 0; i < allUsers.Count; i++)
+            foreach (var user in allUsers)
             {
-                tasks.Add(_fixture.RewardsService.CalculateRewards(allUsers[i]));
+                tasks.Add(_fixture.RewardsService.CalculateRewards(user));
             }
             await Task.WhenAll(tasks);
             foreach (var user in allUsers)
