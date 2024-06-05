@@ -15,7 +15,6 @@ public class RewardsService : IRewardsService
     private readonly int _attractionProximityRange = 200;
     private readonly IGpsUtil _gpsUtil;
     private readonly IRewardCentral _rewardsCentral;
-    private static int count = 0;
 
     public RewardsService(IGpsUtil gpsUtil, IRewardCentral rewardCentral)
     {
@@ -51,7 +50,7 @@ public class RewardsService : IRewardsService
         }
     }
 
-    private bool IsNotRewarded(User user, Attraction attraction)
+    private static bool IsNotRewarded(User user, Attraction attraction)
     {
         for (int k = 0; k < user.UserRewards.Count; k++)
         {
