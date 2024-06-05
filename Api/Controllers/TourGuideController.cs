@@ -29,14 +29,15 @@ public class TourGuideController : ControllerBase
     [HttpGet("getNearbyAttractions")]
     public async Task<ActionResult<List<Attraction>>> GetNearbyAttractions([FromQuery] string userName)
     {
-        List<object> list = new List<object>();
+        List<object> list = new();
         User user = GetUser(userName);
         var visitedLocation = await _tourGuideService.GetUserLocation(user);
         var attractions = await _tourGuideService.GetNearByAttractions(visitedLocation);
-        
+
         foreach (var attraction in attractions)
         {
-            list.Add(new {
+            list.Add(new
+            {
                 Name = attraction.AttractionName,
                 attraction.Latitude,
                 attraction.Longitude,
@@ -44,10 +45,12 @@ public class TourGuideController : ControllerBase
                 Reward = _rewardsService.GetRewardPoints(attraction, user)
             });
         }
-        return Ok(new { 
+        return Ok(new
+        {
             UserLatitude = user.VisitedLocations[0].Location.Latitude,
             UserLongitude = user.VisitedLocations[0].Location.Longitude,
-            Attractions = list });
+            Attractions = list
+        });
     }
 
     [HttpGet("getRewards")]

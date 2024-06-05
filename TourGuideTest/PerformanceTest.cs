@@ -1,14 +1,6 @@
 ﻿using GpsUtil.Location;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TourGuide.LibrairiesWrappers.Interfaces;
-using TourGuide.Services.Interfaces;
 using TourGuide.Users;
-using TourGuide.Utilities;
 using Xunit.Abstractions;
 
 namespace TourGuideTest
@@ -52,7 +44,7 @@ namespace TourGuideTest
 
             List<User> allUsers = _fixture.TourGuideService.GetAllUsers();
 
-            Stopwatch stopWatch = new Stopwatch();
+            Stopwatch stopWatch = new();
             stopWatch.Start();
             var tasks = new List<Task>();
             foreach (var user in allUsers)
@@ -74,7 +66,7 @@ namespace TourGuideTest
             //On peut ici augmenter le nombre d'utilisateurs pour tester les performances
             _fixture.Initialize(100);
 
-            Stopwatch stopWatch = new Stopwatch();
+            Stopwatch stopWatch = new();
             stopWatch.Start();
 
             var attractions = await _fixture.GpsUtil.GetAttractions();
@@ -86,10 +78,8 @@ namespace TourGuideTest
                 tasks.Add(_fixture.RewardsService.CalculateRewards(user));
             }
             await Task.WhenAll(tasks);
-            foreach (var user in allUsers)
-            {
-                Assert.True(user.UserRewards.Count > 0);
-            }
+            allUsers.ForEach(user => Assert.True(user.UserRewards.Count > 0));
+
             stopWatch.Stop();
             _fixture.TourGuideService.Tracker.StopTracking();
 

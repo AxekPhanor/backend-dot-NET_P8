@@ -1,10 +1,5 @@
 ﻿using GpsUtil.Helpers;
 using GpsUtil.Location;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace GpsUtil;
 
@@ -17,7 +12,8 @@ public class GpsUtil
         rateLimiter.Wait();
         try
         {
-            return await Task.Run(() => {
+            return await Task.Run(() =>
+            {
                 Sleep();
 
                 double longitude = ThreadLocalRandom.NextDouble(-180.0, 180.0);
