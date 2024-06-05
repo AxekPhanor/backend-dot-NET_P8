@@ -40,31 +40,29 @@ public class RewardsService : IRewardsService
         var attractions = await _gpsUtil.GetAttractions();
         var nbUserLocations = userLocations.Count;
         var nbAttractions = attractions.Count;
-        bool flag = true;
 
         for (int i = 0; i < nbUserLocations; i++)
         {
             for (int j = 0; j < nbAttractions; j++)
             {
-                for (int k = 0; k < user.UserRewards.Count; k++)
+                if (NearAttraction(userLocations[i], attractions[j]) && IsNotRewarded(user, attractions[j]))
                 {
-                    if (user.UserRewards[k].Attraction.AttractionName == attractions[j].AttractionName)
-                    {
-                        attractions.Remove(attractions[j]);
-                        nbAttractions--;
-                        flag = false; break;
-                    }
+                    user.AddUserReward(new UserReward(userLocations[i], attractions[j], GetRewardPoints(attractions[j], user)));
                 }
-                if (flag)
-                {
-                    if (NearAttraction(userLocations[i], attractions[j]))
-                    {
-                        user.AddUserReward(new UserReward(userLocations[i], attractions[j], GetRewardPoints(attractions[j], user)));
-                    }
-                }
-                flag = true;
             }
         }
+    }
+
+    private bool IsNotRewarded(User user, Attraction attraction)
+    {
+        for (int k = 0; k < user.UserRewards.Count; k++)
+        {
+            if (user.UserRewards[k].Attraction.AttractionName == attraction.AttractionName)
+            {
+                return false;
+            }
+        }
+        return true;
     }
 
     public async Task CalculateRewardsImprove(User user)
