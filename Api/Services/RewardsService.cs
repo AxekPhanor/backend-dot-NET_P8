@@ -38,12 +38,10 @@ public class RewardsService : IRewardsService
     {
         List<VisitedLocation> userLocations = user.VisitedLocations;
         var attractions = await _gpsUtil.GetAttractions();
-        var nbUserLocations = userLocations.Count;
-        var nbAttractions = attractions.Count;
 
-        for (int i = 0; i < nbUserLocations; i++)
+        for (int i = 0; i < userLocations.Count; i++)
         {
-            for (int j = 0; j < nbAttractions; j++)
+            for (int j = 0; j < attractions.Count; j++)
             {
                 if (NearAttraction(userLocations[i], attractions[j]) && IsNotRewarded(user, attractions[j]))
                 {
