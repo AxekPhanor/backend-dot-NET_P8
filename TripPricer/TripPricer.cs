@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TripPricer.Helpers;
+﻿using TripPricer.Helpers;
 
 namespace TripPricer;
 
@@ -56,6 +51,6 @@ public class TripPricer
             8 => "Dancing Waves Cruselines and Partners",
             9 => "AdventureCo",
             _ => "Cure-Your-Blues",
-        };        
+        };
     }
 }
