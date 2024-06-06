@@ -10,7 +10,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  Compilation:
+  Build:
 
     runs-on: ubuntu-latest
 
@@ -24,16 +24,14 @@ jobs:
       run: dotnet restore
     - name: Build
       run: dotnet build --no-restore
-      
-  Test:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+    - name: Tests unitaires
+      run: dotnet test --no-restore --verbosity normal
+    - name: Publish
+      run: dotnet publish --configuration Release --output ./publish
+    - name: Archive artifacts
+      uses: actions/upload-artifact@v2
       with:
-        dotnet-version: 7.0.x
-    - name: test
-      run: dotnet test --verbosity normal
+        name: publish-artifacts
+        path: ./publish
+      
+      
