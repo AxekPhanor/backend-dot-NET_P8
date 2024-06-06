@@ -67,13 +67,6 @@ public class TourGuideController : ControllerBase
         return Ok(deals);
     }
 
-    [HttpGet("getAllUsers")]
-    public ActionResult<List<User>> GetAllUsers()
-    {
-        var users = _tourGuideService.GetAllUsers();
-        return Ok(users);
-    }
-
     private User GetUser(string userName)
     {
         return _tourGuideService.GetUser(userName);
