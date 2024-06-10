@@ -19,7 +19,7 @@ public class TourGuideController : ControllerBase
         _rewardsService = rewardsService;
     }
 
-    [HttpGet("getLocation")]
+    [HttpGet("getLocations")]
     public ActionResult<VisitedLocation> GetLocation([FromQuery] string userName)
     {
         var location = _tourGuideService.GetUserLocation(GetUser(userName));
