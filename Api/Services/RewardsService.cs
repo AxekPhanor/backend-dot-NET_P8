@@ -61,30 +61,6 @@ public class RewardsService : IRewardsService
         return true;
     }
 
-    public async Task CalculateRewardsImprove(User user)
-    {
-        List<VisitedLocation> userLocations = user.VisitedLocations;
-        var attractions = await _gpsUtil.GetAttractions();
-        var userRewardedAttractions = new HashSet<string>(user.UserRewards.Select(r => r.Attraction.AttractionName));
-        var nbUserLocations = userLocations.Count;
-        var nbAttractions = attractions.Count;
-        var tempReward = new List<UserReward>();
-        var attractionNearLocation = new Dictionary<VisitedLocation, List<Attraction>>();
-
-        for (int i = 0; i < userLocations.Count; i++)
-        {
-            var location = userLocations[i];
-            attractionNearLocation[userLocations[i]] = attractions.Where(attraction => NearAttraction(location, attraction)).ToList();
-        }
-        for (int i = 0; i < userLocations.Count; i++)
-        {
-            for (int j = 0; j < attractionNearLocation[userLocations[i]].Count; j++)
-            {
-                user.AddUserReward(new UserReward(userLocations[i], attractionNearLocation[userLocations[i]][j], GetRewardPoints(attractions[j], user)));
-            }
-        }
-    }
-
     public bool IsWithinAttractionProximity(Attraction attraction, Locations location)
     {
         Console.WriteLine(GetDistance(attraction, location));
