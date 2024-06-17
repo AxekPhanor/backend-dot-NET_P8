@@ -30,27 +30,35 @@ public class TourGuideController : ControllerBase
     public async Task<ActionResult<List<Attraction>>> GetNearbyAttractions([FromQuery] string userName)
     {
         List<object> list = new();
-        User user = GetUser(userName);
-        var visitedLocation = await _tourGuideService.GetUserLocation(user);
-        var attractions = await _tourGuideService.GetNearByAttractions(visitedLocation);
-
-        foreach (var attraction in attractions)
+        try
         {
-            list.Add(new
+            User user = GetUser(userName);
+            var visitedLocation = await _tourGuideService.GetUserLocation(user);
+            var attractions = await _tourGuideService.GetNearByAttractions(visitedLocation);
+
+            foreach (var attraction in attractions)
             {
-                Name = attraction.AttractionName,
-                attraction.Latitude,
-                attraction.Longitude,
-                Distance = _rewardsService.GetDistance(attraction, visitedLocation.Location),
-                Reward = _rewardsService.GetRewardPoints(attraction, user)
+                list.Add(new
+                {
+                    Name = attraction.AttractionName,
+                    attraction.Latitude,
+                    attraction.Longitude,
+                    Distance = _rewardsService.GetDistance(attraction, visitedLocation.Location),
+                    Reward = _rewardsService.GetRewardPoints(attraction, user)
+                });
+            }
+            return Ok(new
+            {
+                UserLatitude = visitedLocation.Location.Latitude,
+                UserLongitude = visitedLocation.Location.Longitude,
+                Attractions = list
             });
         }
-        return Ok(new
+        catch
         {
-            UserLatitude = visitedLocation.Location.Latitude,
-            UserLongitude = visitedLocation.Location.Longitude,
-            Attractions = list
-        });
+            return NotFound();
+        }
+        
     }
 
     [HttpGet("getRewards")]
