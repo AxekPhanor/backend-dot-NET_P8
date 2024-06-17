@@ -47,8 +47,8 @@ public class TourGuideController : ControllerBase
         }
         return Ok(new
         {
-            UserLatitude = user.VisitedLocations[0].Location.Latitude,
-            UserLongitude = user.VisitedLocations[0].Location.Longitude,
+            UserLatitude = visitedLocation.Location.Latitude,
+            UserLongitude = visitedLocation.Location.Longitude,
             Attractions = list
         });
     }
