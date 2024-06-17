@@ -58,7 +58,6 @@ public class TourGuideController : ControllerBase
         {
             return NotFound();
         }
-        
     }
 
     [HttpGet("getRewards")]
